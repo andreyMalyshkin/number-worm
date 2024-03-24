@@ -1,5 +1,6 @@
 const utilsFunctions = require('./utils.js')
 const utils = new utilsFunctions()
+const { Instance, connectDB } = require('./db')
 
 module.exports = async function initializeInstance(restApi, instance) {
   utils.logger.info(
@@ -15,21 +16,29 @@ module.exports = async function initializeInstance(restApi, instance) {
     if (data.stateInstance !== 'authorized') {
       utils.logger.error(`Instance ${instance.idInstance} is not online`)
       instance.isOnline = false
-      // TODO: необходимо описать логику, чтобы данные сохранялись в бд и передавался только номер
-    } else {
-      try {
-        const settingsResponse = await restApi.settings.setSettings(
-          utils.settings,
-        )
-        utils.logger.info(
-          `Instance ${instance.idInstance} save settings is ${settingsResponse.saveSettings}`,
-        )
-        instance.isOnline = true
-      } catch (error) {
-        utils.logger.error(
-          `Instance ${instance.idInstance} not take settings ${error}`,
-        )
-      }
+      await Instance.findOneAndUpdate(
+        { idInstance: instance.idInstance },
+        { $set: { isOnline: false } },
+      )
+      return
+    }
+
+    try {
+      const settingsResponse = await restApi.settings.setSettings(
+        utils.settings,
+      )
+      utils.logger.info(
+        `Instance ${instance.idInstance} save settings is ${settingsResponse.saveSettings}`,
+      )
+      instance.isOnline = true
+      await Instance.findOneAndUpdate(
+        { idInstance: instance.idInstance },
+        { $set: { isOnline: true } },
+      )
+    } catch (error) {
+      utils.logger.error(
+        `Instance ${instance.idInstance} not take settings ${error}`,
+      )
     }
   } catch (error) {
     utils.logger.error(
