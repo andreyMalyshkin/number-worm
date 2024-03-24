@@ -2,7 +2,6 @@ const winston = require('winston')
 
 class Utils {
   constructor() {
-
     this.logger = winston.createLogger({
       level: 'info',
       format: winston.format.json(),
