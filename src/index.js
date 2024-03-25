@@ -5,6 +5,7 @@ require('dotenv').config()
 const whatsAppClient = require('@green-api/whatsapp-api-client')
 const initializeInstance = require('./initializeInstance.js')
 const utilsFunctions = require('./utils.js')
+const speakers = require('/speaker.js')
 
 const app = express()
 app.use(cors())
@@ -32,7 +33,7 @@ async function main() {
     })
 
     try {
-      await initializeInstance(restAPI, instance)
+      await initializeInstance(restAPI, instance, phoneNumbers)
     } catch (error) {
       utils.logger.error(error)
       continue
@@ -46,16 +47,17 @@ app.listen(process.env.PORT, () => {
   console.log(`Server is running on port ${process.env.PORT}`)
 })
 
+//Инициализация всех процессов
 connectDB()
-  .then(() => {
-    utils.logger.info('Connected to MongoDB')
-    loadDb().then(() => {
-      main().catch((error) => utils.logger.error(error))
-      setInterval(() => {
-        main().catch((error) => utils.logger.error(error))
-      }, 1800000) // Повторяем каждые 30 минут
+    .then(() => {
+      utils.logger.info('Connected to MongoDB');
+      loadDb().then(() => {
+        main().then(() => {
+          speakers().catch((error) => utils.logger.error(error))
+        }).catch((error) => utils.logger.error(error));
+        setInterval(() => {
+          main().catch((error) => utils.logger.error(error));
+        }, process.env.UPDATE_FREQUENCY);
+      })
     })
-  })
-  .catch((error) =>
-      utils.logger.error('Could not connect to MongoDB:', error),
-  )
+    .catch((error) => utils.logger.error('Could not connect to MongoDB:', error));

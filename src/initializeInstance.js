@@ -4,7 +4,11 @@ const { Instance, connectDB } = require('./db')
 
 //TODO: возможно стоит обдумать другие настройки
 
-module.exports = async function initializeInstance(restApi, instance) {
+module.exports = async function initializeInstance(
+  restApi,
+  instance,
+  phoneNumbers,
+) {
   utils.logger.info(
     `Start checking authorization of instance ${instance.idInstance}`,
   )
@@ -16,13 +20,33 @@ module.exports = async function initializeInstance(restApi, instance) {
     )
 
     //TODO: добавить проверки на другие статусы, например когда не авторизован более - вырезать из бд
-    if (data.stateInstance !== 'authorized') {
+    if ( data.stateInstance !== 'authorized' ) {
       utils.logger.error(`Instance ${instance.idInstance} is not online`)
       instance.isOnline = false
       await Instance.findOneAndUpdate(
         { idInstance: instance.idInstance },
         { $set: { isOnline: false } },
       )
+
+      let isNumberAlreadyAdded = false
+
+      if (
+        instance.wid !== '' ||
+        instance.wid !== null ||
+        instance.wid !== undefined
+      ) {
+        for (let number of phoneNumbers) {
+          if (instance.wid === phoneNumbers[number]) {
+            isNumberAlreadyAdded = true
+            break
+          }
+        }
+
+        if (!isNumberAlreadyAdded) {
+          phoneNumbers.push(instance.wid)
+        }
+      }
+
       return
     }
 

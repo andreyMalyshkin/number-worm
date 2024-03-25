@@ -19,9 +19,9 @@ async function connectDB() {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     })
-      utils.logger.info('MongoDB has been connected')
+    utils.logger.info('MongoDB has been connected')
   } catch (error) {
-      utils.logger.error('Error connecting to MongoDB:', error)
+    utils.logger.error('Error connecting to MongoDB:', error)
   }
 }
 
