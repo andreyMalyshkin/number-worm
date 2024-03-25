@@ -7,7 +7,6 @@ const initializeInstance = require('./initializeInstance.js')
 const utilsFunctions = require('./utils.js')
 
 const app = express()
-const PORT = 3000
 app.use(cors())
 const utils = new utilsFunctions()
 
@@ -40,10 +39,11 @@ async function main() {
       //TODO: описать логику пропуска инстанса и логику проверки ответа от сервера ( вдруг все норм, просто сервис упал )
     }
   }
+
 }
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`)
+app.listen(process.env.PORT, () => {
+  console.log(`Server is running on port ${process.env.PORT}`)
 })
 
 connectDB()
