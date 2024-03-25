@@ -3,6 +3,7 @@ require('dotenv').config() // Убедитесь, что переменные о
 const utilsFunctions = require('./utils.js')
 const utils = new utilsFunctions()
 
+//TODO: расширить данные для работы с бд
 const instanceSchema = new mongoose.Schema({
   idInstance: String,
   token: String,
