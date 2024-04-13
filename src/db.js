@@ -18,10 +18,14 @@ async function connectDB() {
     await mongoose.connect(process.env.DB_HOST, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
-    })
-    utils.logger.info('MongoDB has been connected')
+    });
+    utils.logger.info('MongoDB has been connected');
+    return true;
   } catch (error) {
-    utils.logger.error('Error connecting to MongoDB:', error)
+    utils.logger.error('Error connecting to MongoDB:', error);
+    utils.logger.info('Attempting to reconnect to MongoDB');
+    return false;
+    setTimeout(connectDB(),60000);
   }
 }
 

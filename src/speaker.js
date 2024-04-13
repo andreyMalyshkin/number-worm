@@ -24,6 +24,7 @@ const questions = [
 ];
 
 async function speaker(mainInstance, phoneNumbers) {
+    //TODO: необходимо реализовать отмену отправки если инстанс не онлайн
     for (let instance of mainInstance) {
         const restAPI = whatsAppClient.restAPI({
             idInstance: instance.idInstance,
@@ -35,7 +36,7 @@ async function speaker(mainInstance, phoneNumbers) {
             const chatId = `${phoneNumber}@c.us`;
 
             try {
-                await restAPI.message.sendMessage(chatId, message);
+                await restAPI.message.sendMessage(chatId,phoneNumber, message);
                 console.log(`Сообщение отправлено на номер ${phoneNumber}`);
             } catch (error) {
                 console.error(`Ошибка при отправке сообщения на номер ${phoneNumber}:`, error);
